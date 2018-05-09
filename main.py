@@ -12,13 +12,13 @@ import asyncio
 from pysnmp.hlapi.asyncio import *
 
 @asyncio.coroutine
-def getSNMPv1(hostname, varBinds):
+def getSNMPv1(hostname, vBinds):
     '''
     Simple implementation of SNMP(v1) get command
     Args:
     hostname: tuple of FQDN, port where FQDN is a string representing either 
               hostname or IPv4 address in quad-dotted form, port is an integer
-    varBinds: list of one or more class instances representing MIB variables to 
+    vBinds:   list of one or more class instances representing MIB variables to 
               place into SNMP request.
     '''
     snmpEngine = SnmpEngine()
@@ -27,7 +27,7 @@ def getSNMPv1(hostname, varBinds):
         CommunityData('public', mpModel=0),
         UdpTransportTarget(hostname),
         ContextData(),
-        *varBinds
+        *vBinds
     )
     
     if errorIndication:
@@ -45,13 +45,13 @@ def getSNMPv1(hostname, varBinds):
     snmpEngine.transportDispatcher.closeDispatcher()
 
 @asyncio.coroutine
-def setSNMPv1(hostname, varBinds):
+def setSNMPv1(hostname, vBinds):
     '''
     Simple implementation of SNMP(v1) set command
     Args:
     hostname: tuple of FQDN, port where FQDN is a string representing either 
               hostname or IPv4 address in quad-dotted form, port is an integer
-    varBinds: list of one or more class instances representing MIB variables to 
+    vBinds:   list of one or more class instances representing MIB variables to 
               place into SNMP request.
     '''
     snmpEngine = SnmpEngine()
@@ -60,7 +60,7 @@ def setSNMPv1(hostname, varBinds):
         CommunityData('public', mpModel=0),
         UdpTransportTarget(hostname),
         ContextData(),
-        *varBinds
+        *vBinds
     )
     
     if errorIndication:

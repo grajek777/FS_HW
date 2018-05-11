@@ -11,7 +11,7 @@ http://snmplabs.com/pysnmp/examples/hlapi/asyncio/manager/cmdgen/advanced-topics
 import asyncio
 from pysnmp.hlapi.asyncio import *
 
-async def getSNMPv1(hostname, vBinds):
+async def getSNMPv1(hostname, *vBinds):
     '''
     @brief Simple implementation of SNMP(v1) get command
     Args:
@@ -50,7 +50,7 @@ async def getSNMPv1(hostname, vBinds):
     return varBinds
 
 
-async def setSNMPv1(hostname, vBinds):
+async def setSNMPv1(hostname, *vBinds):
     '''
     @brief Simple implementation of SNMP(v1) set command
     Args:
@@ -102,9 +102,9 @@ async def execConcOpSNMP(hostname, ops):
     coroutines = []
     for op in ops:
         if op[0] == "get":
-            coroutines.append(getSNMPv1(hostname, [op[1]]))
+            coroutines.append(getSNMPv1(hostname, *op[1:]))
         elif op[0] == "set":
-            coroutines.append(setSNMPv1(hostname, [op[1]]))
+            coroutines.append(setSNMPv1(hostname, *op[1:]))
     
     completed, pending = await asyncio.wait(coroutines)
 
@@ -121,9 +121,9 @@ async def execSeqOpSNMP(hostname, ops):
     '''
     for op in ops:
         if op[0] == "get":
-            await getSNMPv1(hostname, [op[1]])
+            await getSNMPv1(hostname, *op[1:])
         elif op[0] == "set":
-            await setSNMPv1(hostname, [op[1]])
+            await setSNMPv1(hostname, *op[1:])
 
 if __name__ == '__main__':
     ###########################################
@@ -140,18 +140,19 @@ if __name__ == '__main__':
                             'Linux v2.0')
     
     try:
-        loop.run_until_complete(setSNMPv1(hostname, [setObject1]))
-        loop.run_until_complete(getSNMPv1(hostname, [getObject1]))
-        loop.run_until_complete(setSNMPv1(hostname, [setObject2]))
-        loop.run_until_complete(getSNMPv1(hostname, [getObject1]))
-        loop.run_until_complete(getSNMPv1(hostname, [getObject1, getObject2]))
+        loop.run_until_complete(setSNMPv1(hostname, setObject1))
+        loop.run_until_complete(getSNMPv1(hostname, getObject1))
+        loop.run_until_complete(setSNMPv1(hostname, setObject2))
+        loop.run_until_complete(getSNMPv1(hostname, getObject1))
+        loop.run_until_complete(getSNMPv1(hostname, getObject1, getObject2))
         print("--------------------------------------")
         
         loop.run_until_complete(execConcOpSNMP(hostname, 
                                               [("set", setObject1),
                                                ("get", getObject1),
                                                ("set", setObject2),
-                                               ("get", getObject1)]
+                                               ("get", getObject1),
+                                               ("get", getObject1, getObject2)]
                                               )
                                 )
         print("--------------------------------------")
@@ -159,7 +160,8 @@ if __name__ == '__main__':
                                              [("set", setObject1),
                                               ("get", getObject1),
                                               ("set", setObject2),
-                                              ("get", getObject1)]
+                                              ("get", getObject1),
+                                              ("get", getObject1, getObject2)]
                                              )
                                 )
     finally:
